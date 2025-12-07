@@ -1,6 +1,6 @@
 # 🍌 MemeStory  
 **Built on Story Protocol**  
-*Contract: `0x548709a2e4ff648378Ed485a02E4BB2f4378EBA3`*
+*MEME Token Contract: `0x548709a2e4ff648378Ed485a02E4BB2f4378EBA3`*
 
 Turn your memes into programmable IP that pays you.  
 AI-generated → auto-uploaded to Pinata → on-chain IP → auto-royalties → remix-to-earn.
