@@ -23,28 +23,28 @@ export default function LandingPage() {
                     className="relative z-10 max-w-4xl space-y-6"
                 >
                     <div className="inline-block px-4 py-1.5 rounded-full bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 font-medium text-sm border border-yellow-200 dark:border-yellow-800 mb-4">
-                        Build on Story Protocol 🍌
+                        Build on Story Protocol
                     </div>
                     <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight">
                         Turn Your Memes into <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-600">
-                            IP Assets
+                            Real IP Assets
                         </span>
                     </h1>
                     <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-                        Create, Remix, and Register your memes on the blockchain.
-                        Protect your creativity and earn royalties with the power of Story Protocol.
+                        MemeStory uses <strong>Story Protocol</strong> to transform your jokes into liquid intellectual property.
+                        Generate with AI, Remix with permission, and <strong>earn royalties</strong> when your content goes viral.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
                         <Link href="/create">
                             <Button size="lg" className="h-14 px-8 text-lg rounded-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold shadow-lg shadow-yellow-500/20 transition-all hover:scale-105 active:scale-95">
-                                Start Creating 🚀
+                                Create & Earn 🍌
                             </Button>
                         </Link>
                         <a href="https://docs.story.foundation" target="_blank" rel="noopener noreferrer">
                             <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-full border-2 hover:bg-muted/50">
-                                Learn More
+                                How it Works
                             </Button>
                         </a>
                     </div>
@@ -68,27 +68,27 @@ export default function LandingPage() {
             <section className="py-24 bg-muted/30 border-t border-b">
                 <div className="container">
                     <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-                        <h2 className="text-3xl font-bold">Why MemeStory?</h2>
-                        <p className="text-muted-foreground">The ultimate platform for meme creators and collectors, powered by next-gen blockchain tech.</p>
+                        <h2 className="text-3xl font-bold">The Future of Meme Economy</h2>
+                        <p className="text-muted-foreground">More than just JPEGs. Build a portfolio of intellectual property that pays you.</p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">
                         <FeatureCard
                             icon={<Wand2 className="w-8 h-8 text-purple-500" />}
-                            title="AI Powered"
-                            description="Generate hilarious memes instantly with Google Gemini 2.0 Flash integration."
+                            title="AI Powered Creation"
+                            description="Generate hilarious memes instantly with Google Gemini 2.0 Flash integration. Pay small, earn big."
                             delay={0.1}
                         />
                         <FeatureCard
                             icon={<Layers className="w-8 h-8 text-blue-500" />}
-                            title="Remix Culture"
-                            description="Use existing memes as a base. Track provenance and give credit where it's due automatically."
+                            title="Fair Remixing"
+                            description="Remix any existing meme. The original creator gets attributed and earns a share of the revenue automatically."
                             delay={0.2}
                         />
                         <FeatureCard
                             icon={<Zap className="w-8 h-8 text-yellow-500" />}
-                            title="Instant IP"
-                            description="Register your creations as IP Assets on Story Protocol in one click. Monetize your humor."
+                            title="Programmable IP"
+                            description="Register your creations on Story Protocol. Set terms, track usage, and unlock new monetization streams."
                             delay={0.3}
                         />
                     </div>

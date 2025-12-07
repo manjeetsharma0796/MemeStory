@@ -9,10 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Layers, Wand2, Download, Loader2 } from "lucide-react";
 import { generateMemeImage } from "@/app/actions/gemini";
 import { RegistrationModal } from "@/components/RegistrationModal";
-import { useAccount } from "wagmi";
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { MEME_TOKEN_ADDRESS, MEME_TOKEN_ABI } from "@/app/constants/memeToken";
 
 const MemeCanvas = dynamic(() => import("@/components/MemeCanvas").then(mod => mod.MemeCanvas), {
     ssr: false,
@@ -51,18 +53,103 @@ function CreateContent() {
         }
     }, [parentImage]);
 
+    const { toast } = useToast();
+    const { address } = useAccount();
+
+    const [isPaying, setIsPaying] = useState(false);
+    const { data: hash, isPending: isTxPending, writeContract } = useWriteContract();
+    const { isLoading: isConfirming, isSuccess: isTxSuccess } = useWaitForTransactionReceipt({
+        hash,
+    });
+
+    const BURN_ADDRESS = "0x83A1d9D264199A918D43C97D220e70317A2dE744";
+    const PAYMENT_AMOUNT = BigInt(5 * 10 ** 18); // 5 MEME
+
+    const { data: balanceData } = useReadContract({
+        address: MEME_TOKEN_ADDRESS as `0x${string}`,
+        abi: MEME_TOKEN_ABI,
+        functionName: 'balanceOf',
+        args: address ? [address] : undefined,
+        query: {
+            enabled: !!address,
+        }
+    });
+
+    // Watch for payment success to trigger generation
+    useEffect(() => {
+        if (isTxSuccess) {
+            toast({
+                title: "Payment Confirmed! 💸",
+                description: "Starting AI generation...",
+            });
+            setIsPaying(false);
+            performGeneration();
+        }
+    }, [isTxSuccess]);
+
     const handleGenerate = async () => {
-        if (!prompt) return;
+        if (!prompt || !address) {
+            if (!address) toast({ title: "Wallet not connected", variant: "destructive", description: "Please connect your wallet to pay and generate." });
+            return;
+        }
+
+        const balance = balanceData ? BigInt(balanceData) : BigInt(0);
+        if (balance < PAYMENT_AMOUNT) {
+            toast({
+                title: "Insufficient MEME Balance 🚫",
+                description: "You need at least 5 MEME to generate. Use the Daily Claim!",
+                variant: "destructive"
+            });
+            return;
+        }
+
+        setIsPaying(true);
+        try {
+            toast({
+                title: "Processing Payment...",
+                description: "Please confirm the transaction to pay 5 MEME.",
+            });
+            writeContract({
+                address: MEME_TOKEN_ADDRESS as `0x${string}`,
+                abi: MEME_TOKEN_ABI,
+                functionName: 'transfer',
+                args: [BURN_ADDRESS, PAYMENT_AMOUNT]
+            });
+        } catch (e) {
+            console.error(e);
+            setIsPaying(false);
+            toast({
+                title: "Payment Failed",
+                description: "Transaction was rejected or failed.",
+                variant: "destructive"
+            });
+        }
+    };
+
+    const performGeneration = async () => {
         setIsLoading(true);
         try {
             const result = await generateMemeImage(prompt);
             if (result.success && result.imageUrl) {
                 setImageUrl(result.imageUrl);
+                toast({
+                    title: "Meme Generated! 🚀",
+                    description: "Your meme is ready on the canvas.",
+                });
             } else {
-                alert(result.error || "Failed");
+                toast({
+                    title: "Generation Failed",
+                    description: result.error || "Unknown error",
+                    variant: "destructive"
+                });
             }
         } catch (e) {
             console.error(e);
+            toast({
+                title: "Generation Error",
+                description: "Something went wrong.",
+                variant: "destructive"
+            });
         } finally {
             setIsLoading(false);
         }
@@ -134,10 +221,16 @@ function CreateContent() {
                             />
                             <Button
                                 onClick={handleGenerate}
-                                disabled={isLoading || !prompt}
+                                disabled={isLoading || isPaying || isTxPending || isConfirming || !prompt}
                                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                             >
-                                {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Generating...</> : "Generate Meme 🚀"}
+                                {isLoading ? (
+                                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Generating...</>
+                                ) : isTxPending || isConfirming || isPaying ? (
+                                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing Payment...</>
+                                ) : (
+                                    "Pay 5 MEME & Generate 🚀"
+                                )}
                             </Button>
                         </CardContent>
                     </Card>

@@ -25,14 +25,25 @@ export default function GalleryPage() {
     const { address: connectedAddress } = useWallet();
     const [hasAutoSearched, setHasAutoSearched] = useState(false);
 
-    // Auto-search connected wallet
+    // Auto-search latest created collection from localStorage
     useEffect(() => {
-        if (connectedAddress && !address && !hasAutoSearched) {
-            setAddress(connectedAddress);
-            handleSearch(connectedAddress);
+        if (!hasAutoSearched) {
+            try {
+                const stored = localStorage.getItem("memeStory_collections");
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (parsed.length > 0) {
+                        const latest = parsed[parsed.length - 1];
+                        setAddress(latest.address);
+                        handleSearch(latest.address);
+                    }
+                }
+            } catch (e) {
+                console.error("Auto-load failed", e);
+            }
             setHasAutoSearched(true);
         }
-    }, [connectedAddress, address, hasAutoSearched]);
+    }, [hasAutoSearched]);
 
     const handleSearch = async (searchAddr?: string) => {
         const target = searchAddr || address;

@@ -1,4 +1,9 @@
-# MemeStory 🍌
+# MemeStory
+### Powered by Story Protocol
+
+**Create your meme and earn royalty - Register as IP**
+
+**MEME Token Contract:** `0x548709a2e4ff648378Ed485a02E4BB2f4378EBA3`
 
 MemeStory is an AI-powered platform for creating, remixing, and registering memes as IP Assets on the Story Protocol.
 
