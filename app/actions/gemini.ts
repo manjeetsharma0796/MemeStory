@@ -55,3 +55,36 @@ export async function generateMemeImage(prompt: string) {
         return { error: error.message || "Failed to generate meme." };
     }
 }
+
+export async function generateMemeDescription(imageBase64: string) {
+    if (!apiKey) {
+        return { error: "GEMINI_API_KEY is not set in environment variables." };
+    }
+
+    try {
+        const ai = new GoogleGenAI({ apiKey });
+
+        // Base64 string might contain metadata "data:image/png;base64,", strip it if present
+        const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash-exp",
+            contents: [
+                {
+                    role: "user",
+                    parts: [
+                        { text: "Describe this meme image in a short, funny, and engaging way suitable for an NFT description. max 2 sentences." },
+                        { inlineData: { mimeType: "image/png", data: base64Data } }
+                    ]
+                }
+            ]
+        });
+
+        const description = response.candidates?.[0]?.content?.parts?.[0]?.text || "No description generated.";
+        return { success: true, description };
+
+    } catch (error: any) {
+        console.error("Gemini Description Error:", error);
+        return { error: error.message || "Failed to generate description." };
+    }
+}

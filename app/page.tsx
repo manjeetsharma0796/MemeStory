@@ -133,6 +133,46 @@ export default function Home() {
 
 
 
+                    {/* Step 2: Upload */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Layers className="w-5 h-5 text-blue-500" />
+                                Upload & Remix
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <p className="text-sm text-muted-foreground">
+                                Upload your own image or an existing meme to remix.
+                            </p>
+                            <div className="grid w-full items-center gap-1.5">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => document.getElementById('file-upload')?.click()}
+                                    className="w-full border-dashed border-2 h-20"
+                                >
+                                    Upload Image
+                                </Button>
+                                <input
+                                    type="file"
+                                    id="file-upload"
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onload = (ev) => {
+                                                if (ev.target?.result) setImageUrl(ev.target.result as string);
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+
                     {/* Step 3: Registration */}
                     <Card className="border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-900/10">
                         <CardHeader>
