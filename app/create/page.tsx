@@ -11,6 +11,8 @@ import { generateMemeImage } from "@/app/actions/gemini";
 import { RegistrationModal } from "@/components/RegistrationModal";
 import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 const MemeCanvas = dynamic(() => import("@/components/MemeCanvas").then(mod => mod.MemeCanvas), {
     ssr: false,
@@ -18,7 +20,20 @@ const MemeCanvas = dynamic(() => import("@/components/MemeCanvas").then(mod => m
 });
 
 export default function CreatePage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <CreateContent />
+        </Suspense>
+    );
+}
+
+function CreateContent() {
     const { isConnected } = useAccount();
+    const searchParams = useSearchParams();
+    const parentContract = searchParams.get('parentContract');
+    const parentTokenId = searchParams.get('parentTokenId');
+    const parentImage = searchParams.get('parentImage');
+
     const [prompt, setPrompt] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [imageUrl, setImageUrl] = useState<string>("");
@@ -29,6 +44,12 @@ export default function CreatePage() {
     const [imageToRegister, setImageToRegister] = useState("");
 
     const stageRef = useRef<any>(null);
+
+    useEffect(() => {
+        if (parentImage) {
+            setImageUrl(parentImage);
+        }
+    }, [parentImage]);
 
     const handleGenerate = async () => {
         if (!prompt) return;
@@ -219,6 +240,8 @@ export default function CreatePage() {
                 onClose={() => setIsRegisterModalOpen(false)}
                 imageUrl={imageToRegister}
                 prompt={prompt}
+                parentContract={parentContract || undefined}
+                parentTokenId={parentTokenId || undefined}
             />
         </div>
     );

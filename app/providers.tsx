@@ -22,11 +22,12 @@ import {
     sepolia,
 } from "wagmi/chains";
 
+import { defineChain } from "viem";
+
 // Define Story Aeneid Chain
-const storyAeneid = {
+const storyAeneid = defineChain({
     id: 1315,
     name: "Story Aeneid",
-    network: "story-aeneid",
     nativeCurrency: {
         decimals: 18,
         name: "IP",
@@ -34,19 +35,21 @@ const storyAeneid = {
     },
     rpcUrls: {
         default: { http: ["https://aeneid.storyrpc.io"] },
-        public: { http: ["https://aeneid.storyrpc.io"] },
     },
     blockExplorers: {
         default: { name: "Story Explorer", url: "https://aeneid.storyscan.xyz" },
     },
     testnet: true,
-};
+    batch: {
+        multicall: false
+    }
+});
 
 const { wallets } = getDefaultWallets();
 
 const config = getDefaultConfig({
     appName: "MemeStory",
-    projectId: "YOUR_PROJECT_ID", // TODO: User should replace this eventually, or we leave generic
+    projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "", // TODO: User should replace this eventually, or we leave generic
     wallets: [
         ...wallets,
         {

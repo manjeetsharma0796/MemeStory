@@ -9,7 +9,7 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-    title: "MemeStory - Nano Banana",
+    title: "🗿 MemeStory ",
     description: "Generate memes with Gemini and register them on Story Protocol",
 };
 

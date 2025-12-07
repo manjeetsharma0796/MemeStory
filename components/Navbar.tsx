@@ -4,9 +4,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge"; // I might need to add badge if I missed it, or use custom
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Droplets, Gift } from "lucide-react";
+import { Droplets, Gift, ExternalLink } from "lucide-react";
+import { useAccount } from "wagmi";
 
 export function Navbar() {
+    const { address, isConnected } = useAccount();
+
     return (
         <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
             <div className="container flex h-16 items-center justify-between">
@@ -34,7 +37,16 @@ export function Navbar() {
                         </Button>
                     </a>
 
-                    <ConnectButton showBalance={{ smallScreen: false, largeScreen: true }} />
+                    {isConnected && address && (
+                        <a href={`https://aeneid.storyscan.io/address/${address}?tab=tokens_nfts`} target="_blank" rel="noopener noreferrer">
+                            <Button variant="secondary" size="sm" className="hidden sm:flex gap-2">
+                                <ExternalLink className="w-4 h-4" />
+                                Explorer
+                            </Button>
+                        </a>
+                    )}
+
+                    <ConnectButton showBalance={false} />
                 </div>
 
             </div >

@@ -9,19 +9,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, CheckCircle2, Plus, Wand2 } from "lucide-react";
 import { useWallet } from "@/hooks/useWallet";
-import { StoryClient, StoryConfig, PILFlavor, aeneid } from "@story-protocol/core-sdk";
-import { custom, http } from "viem";
+import { StoryClient, StoryConfig, PILFlavor } from "@story-protocol/core-sdk";
+import { custom } from "viem";
 import { uploadToPinata, uploadJSONToPinata } from "@/app/actions/story";
-import { generateMemeDescription } from "@/app/actions/gemini"; // New Import
+import { generateMemeDescription } from "@/app/actions/gemini";
 
 interface RegistrationModalProps {
     isOpen: boolean;
     onClose: () => void;
     imageUrl: string;
     prompt: string;
+    parentContract?: string;
+    parentTokenId?: string;
 }
 
-export function RegistrationModal({ isOpen, onClose, imageUrl, prompt }: RegistrationModalProps) {
+export function RegistrationModal({ isOpen, onClose, imageUrl, prompt, parentContract, parentTokenId }: RegistrationModalProps) {
     const { address, client: walletClient } = useWallet();
     const [storyClient, setStoryClient] = useState<StoryClient | null>(null);
 
@@ -126,6 +128,15 @@ export function RegistrationModal({ isOpen, onClose, imageUrl, prompt }: Registr
         }
     };
 
+    // Remix Logic Placeholder
+    useEffect(() => {
+        if (parentContract && parentTokenId) {
+            console.log("Remixing from:", parentContract, parentTokenId);
+            // Ideally resolve IP ID here.
+        }
+    }, [parentContract, parentTokenId]);
+
+
     const handleMintAndRegister = async () => {
         if (!storyClient || !collectionAddress) {
             alert("Please connect wallet and select a collection.");
@@ -143,7 +154,9 @@ export function RegistrationModal({ isOpen, onClose, imageUrl, prompt }: Registr
                 image: ipfsImageUrl,
                 mediaUrl: ipfsImageUrl,
                 mediaType: "image/png",
-                creators: [{ name: "MemeStory Artist", address }]
+                creators: [{ name: "MemeStory Artist", address }],
+                // Add parent info to metadata as fallback provenance
+                attributes: parentContract ? [{ trait_type: "Parent Contract", value: parentContract }, { trait_type: "Parent Token ID", value: parentTokenId }] : []
             };
             const ipMetadataURI = await uploadJSONToPinata(ipMetadata);
 
@@ -197,7 +210,9 @@ export function RegistrationModal({ isOpen, onClose, imageUrl, prompt }: Registr
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-[500px] border-2 border-yellow-400/20 shadow-xl bg-background">
                 <DialogHeader>
-                    <DialogTitle>Register IP Asset</DialogTitle>
+                    <DialogTitle>
+                        {parentContract ? "Remix & Register IP" : "Register IP Asset"}
+                    </DialogTitle>
                 </DialogHeader>
 
                 {status === "success" ? (
@@ -308,7 +323,7 @@ export function RegistrationModal({ isOpen, onClose, imageUrl, prompt }: Registr
                         >
                             {status === "uploading" && <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading to IPFS...</>}
                             {status === "minting" && <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Confirming in Wallet...</>}
-                            {status === "idle" && "Mint & Register"}
+                            {status === "idle" && (parentContract ? "Remix & Register IP" : "Mint & Register IP")}
                         </Button>
                     </div>
                 )}
