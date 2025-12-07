@@ -1,0 +1,12 @@
+.env
+.env.local
+node_modules
+.yalc
+pnpm-lock.yaml
+yalc.lock
+package-lock.json
+build_*
+build*
+th.jpg
+poem.txt
+.next
