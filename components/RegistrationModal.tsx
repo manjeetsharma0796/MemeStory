@@ -34,6 +34,7 @@ export function RegistrationModal({ isOpen, onClose, imageUrl, prompt, parentCon
     const [newCollectionName, setNewCollectionName] = useState("");
 
     const [title, setTitle] = useState("");
+    const [creatorName, setCreatorName] = useState("");
     const [description, setDescription] = useState("");
     const [licenseType, setLicenseType] = useState("non-commercial");
 
@@ -154,7 +155,7 @@ export function RegistrationModal({ isOpen, onClose, imageUrl, prompt, parentCon
                 image: ipfsImageUrl,
                 mediaUrl: ipfsImageUrl,
                 mediaType: "image/png",
-                creators: [{ name: "MemeStory Artist", address }],
+                creators: [{ name: creatorName || "MemeStory User", address }],
                 // Add parent info to metadata as fallback provenance
                 attributes: parentContract ? [{ trait_type: "Parent Contract", value: parentContract }, { trait_type: "Parent Token ID", value: parentTokenId }] : []
             };
@@ -172,12 +173,12 @@ export function RegistrationModal({ isOpen, onClose, imageUrl, prompt, parentCon
             let licenseTerms;
             if (licenseType === 'commercial') {
                 licenseTerms = PILFlavor.commercialRemix({
-                    commercialRevShare: 10,
+                    commercialRevShare: 10000000, // 10% (10,000,000 = 10%)
                     defaultMintingFee: 0n,
-                    currency: '0x1514000000000000000000000000000000000000'
+                    currency: '0x1514000000000000000000000000000000000000' // WIP on Aeneid
                 });
             } else {
-                licenseTerms = PILFlavor.nonCommercialSocialRemix();
+                licenseTerms = PILFlavor.nonCommercialSocialRemixing();
             }
 
             const txResponse = await storyClient.ipAsset.registerIpAsset({
@@ -193,6 +194,8 @@ export function RegistrationModal({ isOpen, onClose, imageUrl, prompt, parentCon
 
             if (txResponse.txHash) {
                 setTxHash(txResponse.txHash);
+                console.log("=====================IP ID:", txResponse.ipId);
+
                 setExplorerUrl(`https://aeneid.explorer.story.foundation/ipa/${txResponse.ipId}`);
                 setStatus("success");
             } else {
@@ -292,6 +295,11 @@ export function RegistrationModal({ isOpen, onClose, imageUrl, prompt, parentCon
                                 </Button>
                             </div>
                             <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe your meme..." />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-yellow-500 font-bold">Creator Name</Label>
+                            <Input value={creatorName} onChange={(e) => setCreatorName(e.target.value)} placeholder="Enter your name or alias" />
                         </div>
 
                         {/* 3. License */}

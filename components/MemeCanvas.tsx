@@ -21,8 +21,19 @@ interface MemeCanvasProps {
 }
 
 const URLImage = ({ src, width, height }: { src: string, width: number, height: number }) => {
-    const [image] = useImage(src, 'anonymous'); // Check CORS
-    return <KonvaImage image={image} width={width} height={height} />;
+    const [image] = useImage(src, 'anonymous');
+
+    if (!image) return null;
+
+    // "Contain" logic: calculate scale to fit image inside width/height maintaining aspect ratio
+    const scale = Math.min(width / image.width, height / image.height);
+    const newWidth = image.width * scale;
+    const newHeight = image.height * scale;
+
+    const x = (width - newWidth) / 2;
+    const y = (height - newHeight) / 2;
+
+    return <KonvaImage image={image} width={newWidth} height={newHeight} x={x} y={y} />;
 };
 
 export function MemeCanvas({ imageUrl, texts, onUpdateText, onSelectText, selectedId, stageRef }: MemeCanvasProps) {
